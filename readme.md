@@ -391,6 +391,8 @@ public class Line implements Drawable {
 ___
 ### Data Structure
 Array is filled with default: zero for numbers, false for boolean, the character with Unicode number zero for char, and null for objects.
+
+Variable length array: `import java.util.ArrayList;`
 ```Java
 int[] list;
 list = new int[5]; // must specify length (final)
@@ -416,4 +418,21 @@ System.arraycopy(A, 0, B, 0, A.length);
 for ( int item : A )
   System.out.println( item );
 
+```
+
+Variable arity array as arguments
+- treated as an array
+- can also pass in array
+- `...` applied only to the last formal parameter in a method definition.
+```Java
+public static double average( double...  numbers ) {
+
+public static String concat( Object... values ) {
+   StringBuffer buffer;  // Use a StringBuffer for more efficient concatenation.
+   buffer = new StringBuffer();  // Start with an empty buffer.
+   for ( Object obj : values ) { // A "for each" loop for processing the values.
+       buffer.append(obj); // Add string representation of obj to the buffer.
+   }
+   return buffer.toString(); // return the contents of the buffer
+}
 ```
