@@ -436,3 +436,21 @@ public static String concat( Object... values ) {
    return buffer.toString(); // return the contents of the buffer
 }
 ```
+
+* the type of the loop control variable must be Object. Type cast is needed.
+  * error only detected at run time (type cast)
+* Updated version: ArrayList<BaseType>
+  * can grow to any size.
+* order version: `java.util.Vector`
+  * can grow to any size.
+```Java
+rects  =  new ArrayList<ColoredRect>();
+ColoredRect rect = rects.get(i);
+
+for ( ColoredRect rect : rects ) {
+    g.setColor( rect.color );
+    g.fillRect( rect.x, rect.y, rect.width, rect.height );
+    g.setColor( Color.BLACK );
+    g.drawRect( rect.x, rect.y, rect.width - 1, rect.height - 1 );
+}
+```
