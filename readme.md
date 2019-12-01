@@ -424,8 +424,9 @@ Variable arity array as arguments
 - treated as an array
 - can also pass in array
 - `...` applied only to the last formal parameter in a method definition.
+
 ```Java
-public static double average( double...  numbers ) {
+public static double average( double...  numbers ) {}
 
 public static String concat( Object... values ) {
    StringBuffer buffer;  // Use a StringBuffer for more efficient concatenation.
@@ -453,4 +454,227 @@ for ( ColoredRect rect : rects ) {
     g.setColor( Color.BLACK );
     g.drawRect( rect.x, rect.y, rect.width - 1, rect.height - 1 );
 }
+
+// two D array
+int[][] A = new int[3][4];
+
+int[][] A = {
+  { 1, 0,12,-1},
+  { 7,-3, 2, 5},
+  {-5,-2, 2,-9}
+};
+
 ```
+
+### Chapter VIII Correctness, Robustness, Efficiency
+* Cannot assign `null` to any variables with declared types
+* Cannot manipulate pointers
+* Memory leak impossible
+* Buffer overflow impossible
+* Java don't guard against integer overflow, double overflow
+
+> An exception might be an error, or it might just be a special case that you would rather not have clutter up your elegant algorithm.
+
+* `java.lang.Throwable` has two direct subclasses `Error` and `Exception`
+* Doesn't require handling (simply allow to crash): `Error`, `RunTimeException`
+  - All others require error handling
+* Useful methods for a `Throwable` objects:
+  - `e.getMessage()`
+  - `e.toString()`
+  - `e.printStackTrace()`
+* One `try` can have multiple `catch`
+* a `try` statement can have either a `finally` clause, or one or more `catch` clauses, or both
+  * The semantics of the finally clause is that the block of statements in the finally clause is guaranteed to be executed as the last step in the execution of the try statement, whether or not any exception occurs and whether or not any exception that does occur is caught and handled.
+
+```java
+try {
+   double determinant = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+   System.out.println("The determinant of M is " + determinant);
+}
+catch ( ArrayIndexOutOfBoundsException e ) {
+  System.out.println("M is the wrong size to have a determinant.");
+}
+catch ( NullPointerException e ) {
+  System.out.print("Programming error!  M doesn’t exist." + );
+}
+
+// both can be caught in one catch
+try {
+   double determinant = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+   System.out.println("The determinant of M is " + determinant);
+}
+catch ( RuntimeException err ) {
+  System.out.println("Sorry, an error has occurred.");
+  System.out.println("The error was: " + err);
+}
+
+throw new ArithmeticException("Division by zero");
+```
+
+> That is, if the subroutine was called inside a try statement that has an appropriate catch clause, then that catch clause will be executed and the program will continue on normally from there. Again, if the second routine does not handle the exception, then it also is terminated and the routine that called it (if any) gets the next shot at the exception. The exception will crash the program only if it passes up through the entire chain of subroutine calls without being handled. (In fact, even this is not quite true: In a multithreaded program, only the thread in which the exception occurred is terminated.)
+
+* Can declare `Throwable` in function signature
+  * checked exception must be in function signature, *If the throw statement does not occur in a try statement that catches the error*
+* **checked exceptions**: If a subroutine can throw such an exception, that fact must be announced in a throws clause in the routine definition.
+* Exception-handling is mandatory for any exception class that is not a subclass of either Error or RuntimeException.
+* These checked exceptions generally represent conditions that are outside the control of the programmer.
+
+```java
+static public double root( double A, double B, double C ) throws IllegalArgumentException, NullPointerException, ArrayIndexOutOfBoundsException {}
+```
+* Custom exception
+  - no require mandatory handling: `RuntimeException`
+  - require: `Exception`
+
+```java
+public class ParseError extends Exception {
+  public ParseError(String message) {
+  // Create a ParseError object containing
+  // the given message as its error message.
+  super(message);
+} }
+```
+
+#### Assertion
+* In Java, however, assertions are turned on and off at run time rather than at compile time
+* there is little or no performance penalty for having the assertions in the program
+* In the usual command line environment, assertions are enabled by adding the option `-enableassertions` to the java command that is used to run the program.
+
+```Java
+assert A != 0 : "Leading coefficient of quadratic equation cannot be zero.";
+```
+
+```bash
+java -enableassertions RootFinder
+java -ea RootFinder
+java -ea:⟨class-name⟩ RootFinder
+java -ea:⟨package-name⟩... RootFinder
+```
+
+#### Annotation
+* unfortunately the list of warnings and their names is not standardized and will vary from one compiler to another.
+* "boilerplate” code—that is, code that has a very standardized format and that can be generated mechanically. "
+```java
+@Override public void WindowClosed(WindowEvent evt) { ... }
+@Deprecated
+@SuppressWarnings
+@SuppressWarnings("deprecation")
+```
+
+___
+### Chapter 11 Generic Programming
+* results: a category of errors that show up only at run time,
+* java collection framework
+  - collection `Collection<T> `
+    * set `Set<T>`
+      - `TreeSet` has the property that the elements of the set are arranged into ascending sorted order.
+        * must contain object that implements `Comparable<T>`
+        * or provide a `Comparator<T>` to `TreeSet` constructor
+        * `equal()` is not used to determine uniqueness, custom comparator is!
+        * stored as `BST`
+      - `HashSet` stores its elements in a hash table
+    * list `List<T>`
+      - `LinkedList` class is more efficient in applications where items will often be added or removed at the beginning of the list or in the middle of the list.
+        * `linkedlist.getFirst()`
+        * `linkedlist.getLast()`
+        * `linkedlist.removeFirst()` remove and return
+        * `linkedlist.removeLast()` remove and return
+        * `linkedlist.addFirst(obj)`
+        * `linkedlist.addLast(obj)` same as `linkedlist.add(obj)`
+      - `ArrayList` class is more efficient when random access to items is required. Random access means accessing the k-th item in the list, for any integer k.
+      - both defines `list.get(index)`, `list.set(index,obj)`, `list.add(index,obj)`, `list.remove(index)`, `list.indexOf(obj)`
+      - `list.listIterator()`: `hasNext()`, `next()`, `remove()`, `hasPrevious()`, `previous()`, `add(obj)`
+  - map `Map<T,S>`
+* since java 5.0: introduced parametrized types
+* still legal to use a parameterized class as a non-parameterized type, such as a plain ArrayList.
+
+**Iterators**: Different types of collections have iterators that are implemented in different ways, but all iterators are used in the same way.
+* The interface Iterator<T> defines just three methods.
+```java
+iter.next()
+iter.hasNext()
+iter.remove() // has no parameter. It removes the item that was most recently returned by iter.next()
+
+Iterator<String> iter;
+iter = coll.iterator();
+while ( iter.hasNext() ) {
+   String item = iter.next();
+   System.out.println(item);
+}
+
+for ( T x : coll ) {
+  // "for each object x, of type T, in coll"
+  //  process x
+}
+
+// generic insert
+ListIterator < String > iter = stringList.listIterator();
+// Move the iterator so that it points to the position where
+// newItem should be inserted into the list.  If newItem is
+// bigger than all the items in the list, then the while loop
+// will end when iter.hasNext() becomes false, that is, when
+// the iterator has reached the end of the list.
+while (iter.hasNext()) {
+    String item = iter.next();
+    if (newItem.compareTo(item) <= 0) {
+        // newItem should come BEFORE item in the list.
+        // Move the iterator back one space so that
+        // it points to the correct insertion point,
+        // and end the loop.
+        iter.previous();
+        break;
+    }
+}
+iter.add(newItem);
+```
+
+#### Comparable
+* If you write your own class, you might want to define an equals() method in that class to get the correct behavior when objects are tested for equality.
+* Objects that are meant to be compared should implement the interface `java.lang.Comparable`: `public int compareTo( T obj )`
+* To sort a collection, use static method `Collections.sort()`
+```java
+public class FullName implements Comparable < FullName > {
+    private String firstName,
+    lastName; // Non-null first and last names.
+    public FullName(String first, String last) { // Constructor.
+        if (first == null || last == null)
+            throw new IllegalArgumentException("Names must be non-null.");
+        firstName = first;
+        lastName = last;
+    }
+    public boolean equals(Object obj) {
+        try {
+            FullName other = (FullName) obj; // Type-cast obj to type FullName
+            return firstName.equals(other.firstName) &&
+                lastName.equals(other.lastName);
+        } catch (Exception e) {
+            return false; // if obj is null or is not of type FullName
+        }
+    }
+    public int compareTo(FullName other) {
+        if (lastName.compareTo(other.lastName) < 0) {
+            // If lastName comes before the last name of
+            // the other object, then this FullName comes
+            // before the other FullName.  Return a negative
+            // value to indicate this.
+            return -1;
+        } else if (lastName.compareTo(other.lastName) > 0) {
+            // If lastName comes after the last name of
+            // the other object, then this FullName comes
+            // after the other FullName.  Return a positive
+            // value to indicate this.
+            return 1;
+        } else {
+            // Last names are the same, so base the comparison on
+            // the first names, using compareTo from class String.
+            return firstName.compareTo(other.firstName);
+        }
+    }
+
+}
+```
+
+#### Comparator
+* `Comparator<T>` interface: `public int compare( T obj1, T obj2 )`
+* To sort a collection, use static method `Collections.sort(list,comparator);`
+* Can easily dump one collection into another `ArrayList<String> list = new ArrayList<String>( new TreeSet<String>(coll) );`
