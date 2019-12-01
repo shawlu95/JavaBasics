@@ -567,12 +567,20 @@ ___
 * java collection framework
   - collection `Collection<T> `
     * set `Set<T>`
-      - `TreeSet` has the property that the elements of the set are arranged into ascending sorted order.
+      - `TreeSet` has the property that the elements of the set are arranged into **ascending** sorted order.
         * must contain object that implements `Comparable<T>`
         * or provide a `Comparator<T>` to `TreeSet` constructor
         * `equal()` is not used to determine uniqueness, custom comparator is!
         * stored as `BST`
       - `HashSet` stores its elements in a hash table
+        * `equals()` determine uniqueness
+        * no order, no need for comparator
+        * `A.add(x)` adds the element x to the set A.
+        * `A.remove(x)` removes the element x from the set A.
+        * `A.contains(x)` tests whether x is an element of the set A. • A.addAll(B) computes the union of A and B.
+        * `A.retainAll(B)` computes the intersection of A and B.
+        * `A.removeAll(B)` computes the set difference, A - B.
+      - `EnumSet`: one bit for each enum constant
     * list `List<T>`
       - `LinkedList` class is more efficient in applications where items will often be added or removed at the beginning of the list or in the middle of the list.
         * `linkedlist.getFirst()`
@@ -585,6 +593,14 @@ ___
       - both defines `list.get(index)`, `list.set(index,obj)`, `list.add(index,obj)`, `list.remove(index)`, `list.indexOf(obj)`
       - `list.listIterator()`: `hasNext()`, `next()`, `remove()`, `hasPrevious()`, `previous()`, `add(obj)`
   - map `Map<T,S>`
+    * `TreeMap<K,V>`: keys stored in BST, must be comparable, or provide comparator
+      - `compareTo()` determine equality
+    * `HashMap<K,V>`: must have `equals()` for keys
+    * *A Map is not a Collection, and maps do not implement all the operations defined on collections.*
+      - `map.keySet()` return a `Set<K>.` called a view of the **actual objects** that are stored in the map
+      - cannot add key to a view
+      - `map.values()` return a collection `Collection<V>` which may contain duplicates.
+      - `map.entrySet()` return `Map.Entry<K,V>` a set of association
 * since java 5.0: introduced parametrized types
 * still legal to use a parameterized class as a non-parameterized type, such as a plain ArrayList.
 
@@ -678,3 +694,224 @@ public class FullName implements Comparable < FullName > {
 * `Comparator<T>` interface: `public int compare( T obj1, T obj2 )`
 * To sort a collection, use static method `Collections.sort(list,comparator);`
 * Can easily dump one collection into another `ArrayList<String> list = new ArrayList<String>( new TreeSet<String>(coll) );`
+
+```java
+class AlphabeticalOrder implements Comparator < String > {
+    public int compare(String str1, String str2) {
+        String s1 = str1.toLowerCase(); // Convert to lower case.
+        String s2 = str2.toLowerCase();
+        return s1.compareTo(s2); // Compare lower-case Strings.
+    }
+}
+
+index = new TreeMap < String, TreeSet < Integer >> (new AlphabeticalOrder());
+```
+
+#### EnumSet
+```Java
+enum Day { SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY }
+EnumSet.of( Day.WEDNESDAY, Day.FRIDAY )
+EnumSet<Day> weekday = EnumSet.range( Day.MONDAY, Day.FRIDAY );
+EnumSet<Day> weekend = EnumSet.complementOf( weekday );
+EnumSet<Day> everyday = EnumSet.allOf( Day.class );
+
+options = EnumSet.noneOf( FontOption.class ) // — Turn off all options.
+options = EnumSet.of( FontOption.BOLD ) // — Use bold, with no other options.
+options.add( FontOption.BOLD ) // — Add bold to any options that are already on.
+options.remove( FontOption.UNDERLINED ) // — Turn underlining off (if it’s on).
+```
+
+#### Map
+```java
+map.get(key)
+map.put(key,value)
+map.putAll(map2)
+map.remove(key)
+map.containsKey(key)
+map.containsValue(value)
+map.size()
+map.isEmpty()
+map.clear()
+
+for ( String key : map.keySet() ) {  // "for each key in the map’s key set"
+   Double value = map.get(key);
+   System.out.println( "   (" + key + "," + value + ")" );
+}
+
+for ( Map.Entry<String,Double> entry : map.entrySet() ) {
+  System.out.println( "   (" + entry.getKey() + "," + entry.getValue() + ")" );
+}
+```
+
+#### View
+Modifying a view will modify the underlying objects.
+```java
+map.keySet()
+map.values()
+map.entrySet()
+list.subList( fromIndex, toIndex )
+
+// for TreeSet
+set.subSet(fromElement,toElement)
+
+// for TreeMap
+map.subMap(fromKey,toKey)
+map.headMap(toKey)
+map.tailMap(fromKey)
+```
+
+#### HashTable
+> In the type of hash table that is used in Java, each array location actually holds a linked list of key/value pairs (possibly an empty list)
+
+* the number of items in the hash table should be somewhat less than the number of locations in the array.
+* whenever the number of items exceeds 75% of the array size, the array is replaced by a larger one and all the items in the old array are inserted into the new one.
+* two objects that are equal according to the equals() method must have the same hash code.
+* default: In the Object class, this condition is satisfied because both equals() and hashCode() are based on the address of the memory location where the object is stored.
+* If a class redefines the equals() method, and if objects of that class will be used as keys in hash tables, then the class should also redefine the hashCode() method.
+
+> Neither SelectionSort nor QuickSort are stable sorting algorithms. Insertion sort is stable, but is not very fast. Merge sort, the sorting algorithm used by Collections.sort(), is both stable and fast.
+
+#### Write Generic Class
+* you don’t have to use “T” as the name of the type parameter in the definition of the generic class.
+* For a generic method, the “<T>” goes just before the name of the return type of the method
+* *Queue < T >*
+```java
+// generic queue
+// non-generic would have `class QueueOfStrings`
+class Queue < T > {
+    private LinkedList < T > items = new LinkedList < T > ();
+    public void enqueue(T item) {
+        (online)
+        items.addLast(item);
+    }
+    public T dequeue() {
+        return items.removeFirst();
+    }
+    public boolean isEmpty() {
+        return (items.size() == 0);
+    }
+}
+
+// instantiate
+new Queue<String>();
+
+class Pair < T, S > {
+    public T first;
+    public S second;
+    public Pair(T a, S b) { // Constructor.
+        first = a;
+        second = b;
+    }
+}
+
+Pair < String, Color > colorName = new Pair < String, Color > ("Red", Color.RED);
+Pair < Double, Double > coordinates = new Pair < Double, Double > (17.3, 42.8);
+
+// non-generic would have `public static int countOccurrences(String[] list, String itemToCount)`
+// cannot use countOccurrences to count the number of occurrences of 17 in an array of type int[ ].
+public static < T > int countOccurrences(T[] list, T itemToCount) {
+    int count = 0;
+    if (itemToCount == null) {
+        for (T listItem: list)
+            if (listItem == null)
+                count++;
+    } else {
+        for (T listItem: list)
+            if (itemToCount.equals(listItem))
+              count++;
+    }
+    return count;
+}
+
+// call method (types are deduced, not declared)
+countOccurrences( numbers, 17 );
+
+// even more generic: ArrayList of Integers, a TreeSet of Strings, a LinkedList of JButtons, . . . .
+public static < T > int countOccurrences(Collection < T > collection, T itemToCount) {
+    int count = 0;
+    if (itemToCount == null) {
+        for (T item: collection)
+            if (item == null)
+                count++;
+    } else {
+        for (T item: collection)
+            if (itemToCount.equals(item))
+                count++;
+    }
+    return count;
+}
+```
+
+#### Wildcard
+* The place where a wildcard type is most likely to occur, by far, is in a formal parameter list, where the wildcard type is used in the declaration of the type of a formal parameter.
+* Subclass are not recognized if superclass is referenced
+* This prevent method from adding a sibling class to the collection, which share the same ancestor class
+* `? extends Shape`: any type that is either equal to Shape or that is a subclass of Shape
+* `? super T`: either T itself or any class that is a superclass of T.
+* The wildcard type “<?>” is equivalent to “<? extends Object>”.
+
+```java
+public static void drawAll(Collection<? extends Shape> shapes) {
+  for ( Shape s : shapes )
+    s.draw();
+}
+```
+
+* To allow subclass to be added to collection (not sibling class), use the wildcard:
+
+```java
+public void addAll(Collection << ? extends T > collection) {
+    // Add all the items from the collection to the end of the queue
+    for (T item: collection)
+        enqueue(item);
+}
+
+public void addAllTo(Collection << ? super T > collection) {
+    // Remove all items currently on the queue and add them to collection
+    while (!isEmpty()) {
+        T item = dequeue(); // Remove an item from the queue.
+        collection.add(item); // Add it to the collection.
+    }
+}
+```
+
+#### Bounded Types
+* Only allow `JComponent` or its subclasses
+* `T extends SomeType`: The type SomeType doesn’t have to be the name of a class.
+  - It can be any name that represents an actual object type. For example, it can be an interface or even a parameterized type.
+* can be used only as a formal type parameter in the definition of a generic method, class, or interface.
+* bounded type parameters can only use **extends**, never **super**.
+
+> If a generic method definition uses the generic type name more than once or uses it outside the formal parameter list of the method, then the generic type cannot be replaced with a wildcard type.
+
+```Java
+public class ComponentGroup<T extends JComponent> { ... }
+
+// formal type parameter: a generic method with a bounded type parameter
+// only be called for collections whose base type is JComponent or some subclass of JComponent.
+public static < T extends JComponent > void repaintAll(Collection < T > comps) {
+    for (JComponent c: comps)
+        if (c != null)
+            c.repaint();
+}
+
+// wildcard version
+public static void repaintAll(Collection << ? extends JComponent > comps) {
+    for (JComponent c: comps)
+        if (c != null)
+            c.repaint();
+}
+
+// cannot write with wildcard
+static < T extends Comparable > void sortedInsert(List < T > sortedList, T newItem) {
+    ListIterator < T > iter = sortedList.listIterator();
+    while (iter.hasNext()) {
+        T item = iter.next();
+        if (newItem.compareTo(item) <= 0) {
+            iter.previous();
+            break;
+        }
+    }
+    iter.add(newItem);
+}
+```
