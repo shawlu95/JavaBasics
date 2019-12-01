@@ -771,6 +771,8 @@ map.tailMap(fromKey)
 
 > Neither SelectionSort nor QuickSort are stable sorting algorithms. Insertion sort is stable, but is not very fast. Merge sort, the sorting algorithm used by Collections.sort(), is both stable and fast.
 
+![alt-table](./assets/java_hashtable.png)
+
 #### Write Generic Class
 * you don’t have to use “T” as the name of the type parameter in the definition of the generic class.
 * For a generic method, the “<T>” goes just before the name of the return type of the method
@@ -915,3 +917,7 @@ static < T extends Comparable > void sortedInsert(List < T > sortedList, T newIt
     iter.add(newItem);
 }
 ```
+___
+### Chapter XI: Stream
+* byte stream: machine readable, `OutputStream`, `OutputStream`
+* character stream: human readable `Reader`, `Writer`
