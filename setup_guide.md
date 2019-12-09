@@ -1,4 +1,4 @@
-changed### Install Java 8 & JRE 8
+### Install Java 8 & JRE 8
 Flink requires **Java 8.x** installations. Later version is not encouraged (prone to compatibility issues).
 
 Click to download [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) and [JRE 8](https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html). Follow the installation guide below:
@@ -103,31 +103,65 @@ $ mvn archetype:generate                               \
 curl https://flink.apache.org/q/quickstart.sh | bash -s 1.9.0
 ```
 
+
 #### Sample Project [[wiki-edits](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started/tutorials/datastream_api.html#writing-a-flink-program)]
 * The command should be executed in the directory which contains the relevant pom file.
 
 ```bash
-$ cd /Users/shaw.lu/Documents/scratch/wiki-edit
-# $ mvn clean package
+$ mvn archetype:generate \
+    -DarchetypeGroupId=org.apache.flink \
+    -DarchetypeArtifactId=flink-quickstart-java \
+    -DarchetypeVersion=1.9.0 \
+    -DgroupId=wiki-edits \
+    -DartifactId=wiki-edits \
+    -Dversion=0.1 \
+    -Dpackage=wikiedits \
+    -DinteractiveMode=false
+
+$ rm wiki-edits/src/main/java/wikiedits/*.java
+
+# checklist
+# 1. update dependencies (add wikiedits_2.11)
+# 2. start 
+$ mvn clean package
 $ mvn exec:java -Dexec.mainClass=wikiedits.WikipediaAnalysis
 ```
 
-**ERROR** when submitting to flink
-
+#### Sample Project [WordCount](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started/tutorials/local_setup.html)
 ```bash
-/Users/shaw.lu/Documents/flink-1.9.1/bin/flink \
-run /Users/shaw.lu/Documents/scratch/wiki-edits/target/wiki-edits-0.1.jar
+# Start Flink
+./bin/start-cluster.sh  
 
-# error: The program's entry point class 'wikiedits.StreamingJob' was not found in the jar file.
-```
-
-Flink tutorial [WordCount](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started/tutorials/local_setup.html)
-```bash
-./bin/start-cluster.sh  # Start Flink
+# start netcat
 nc -l 9000
+
+# submit flink job
 ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
+
+# check log (continuously updated
 tail -f log/flink-*-taskexecutor-*.out
+
+# stop server
 ./bin/stop-cluster.sh
 ```
 
-[[Kafka](https://kafka.apache.org/0110/documentation.html#quickstart) Official Doc] 
+### Kafka
+Install [[Kafka](https://kafka.apache.org/0110/documentation.html#quickstart) Official Doc].
+```bash
+# start zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# start server
+bin/kafka-server-start.sh config/server.properties
+
+# create a topic called test
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+
+# list all topics
+bin/kafka-topics.sh --list --zookeeper localhost:2181
+
+# start publisher and keep termimal opem to send message
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+
+# start consumer in another terminal
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
