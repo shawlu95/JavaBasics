@@ -16,7 +16,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.231-b11, mixed mode)
 ```
 
 ___
-### Change Java
+### Change Default Java Version
 Flink requires Maven 3.0.4 (or higher)
 
 Before installing Maven, make sure `$JAVA_HOME` environment variable has been set [[help](https://stackoverflow.com/questions/14702702/how-to-set-java-home-in-mac-permanently/14702771)]
@@ -87,7 +87,7 @@ OS name: "mac os x", version: "10.14.6", arch: "x86_64", family: "mac"
 
 ___
 ### Start Flink
-Project template [[Link](https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/projectsetup/java_api_quickstart.html)]. Need to enter the following for each new projects:
+Download Flink [here](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started/tutorials/local_setup.html). Project template [[Link](https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/projectsetup/java_api_quickstart.html)]. Need to enter the following for each new projects:
 * Define value for property 'groupId': typically same as 'artifactId'
 * Define value for property 'artifactId': name of newly created directory
 * Define value for property 'version' 1.0-SNAPSHOT: : 0
@@ -122,7 +122,7 @@ $ rm wiki-edits/src/main/java/wikiedits/*.java
 
 # checklist
 # 1. update dependencies (add wikiedits_2.11)
-# 2. start 
+# 2. start
 $ mvn clean package
 $ mvn exec:java -Dexec.mainClass=wikiedits.WikipediaAnalysis
 ```
@@ -165,3 +165,179 @@ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 
 # start consumer in another terminal
 bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+### Gradle
+* Create new build [[Link](https://guides.gradle.org/creating-new-gradle-builds/)]
+* plugin must be added at the top
+* `group` and `description` of a task can be anything
+* `gradlew`: gradle wrapper script
+* `./gradlew build`: best practice
+  - compiles the classes, runs the tests, and generates a test report.
+  - first run will download libraries to `~/.gradle`
+* generate new project
+
+```bash
+# the command runs the wrapper script
+# and generates the gradlew and gradlew.bat wrapper scripts.
+gradle init
+```
+
+* Change java version: `File->Project Structure`
+
+```bash
+gradle build --scan
+
+# run copy task
+./gradlew copy
+
+# run gradle zip task
+./gradlew zip
+
+# discover available task
+./gradlew tasks
+
+# scan a single task
+./gradlew zip --scan
+
+# Find properties of project
+./gradlew properties
+
+# run jar file
+java -cp ./demo2-all.jar demo2.App
+```
+
+
+```
+❯ ./gradlew tasks
+
+> Task :tasks
+
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+
+Archive tasks
+-------------
+zip - Archives sources in a zip file
+
+Build tasks
+-----------
+assemble - Assembles the outputs of this project.
+build - Assembles and tests this project.
+clean - Deletes the build directory.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Custom tasks
+------------
+copy - Simply copies sources to a the build directory
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'basic-demo'.
+components - Displays the components produced by root project 'basic-demo'. [incubating]
+dependencies - Displays all dependencies declared in root project 'basic-demo'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'basic-demo'.
+dependentComponents - Displays the dependent components of components in root project 'basic-demo'. [incubating]
+help - Displays a help message.
+model - Displays the configuration model of root project 'basic-demo'. [incubating]
+projects - Displays the sub-projects of root project 'basic-demo'.
+properties - Displays the properties of root project 'basic-demo'.
+tasks - Displays the tasks runnable from root project 'basic-demo'.
+
+Verification tasks
+------------------
+check - Runs all checks.
+
+Rules
+-----
+Pattern: clean<TaskName>: Cleans the output files of a task.
+Pattern: build<ConfigurationName>: Assembles the artifacts of a configuration.
+Pattern: upload<ConfigurationName>: Assembles and uploads the artifacts belonging to a configuration.
+
+To see all tasks and more detail, run gradlew tasks --all
+
+To see more detail about a task, run gradlew help --task <task>
+
+BUILD SUCCESSFUL in 0s
+1 actionable task: 1 executed
+```
+
+Rebuild gradle exampple
+
+```
+(base) 04L0219100014DD:gradle_tutorial shaw.lu$ cd demo2
+(base) 04L0219100014DD:demo2 shaw.lu$ ls
+build		gradle		gradlew.bat	src
+build.gradle	gradlew		settings.gradle
+(base) 04L0219100014DD:demo2 shaw.lu$ ls -al
+total 56
+drwxr-xr-x  13 shaw.lu  admin   416 Dec 10 17:17 .
+drwxr-xr-x   8 shaw.lu  admin   256 Dec 10 14:12 ..
+-rw-r--r--   1 shaw.lu  admin   154 Dec 10 14:13 .gitattributes
+-rw-r--r--   1 shaw.lu  admin   103 Dec 10 14:13 .gitignore
+drwxr-xr-x   5 shaw.lu  admin   160 Dec 10 14:14 .gradle
+drwxr-xr-x   8 shaw.lu  admin   256 Dec 10 17:20 .idea
+drwxr-xr-x  11 shaw.lu  admin   352 Dec 10 17:17 build
+-rw-r--r--   1 shaw.lu  admin  1033 Dec 10 17:17 build.gradle
+drwxr-xr-x   3 shaw.lu  admin    96 Dec 10 14:13 gradle
+-rwxr-xr-x   1 shaw.lu  admin  5764 Dec 10 14:13 gradlew
+-rw-r--r--   1 shaw.lu  admin  2942 Dec 10 14:13 gradlew.bat
+-rw-r--r--   1 shaw.lu  admin   354 Dec 10 14:13 settings.gradle
+drwxr-xr-x   4 shaw.lu  admin   128 Dec 10 14:13 src
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf .gradle
+(base) 04L0219100014DD:demo2 shaw.lu$ RM -RF .idea
+RM: illegal option -- F
+usage: rm [-f | -i] [-dPRrvW] file ...
+       unlink file
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf .idea/
+(base) 04L0219100014DD:demo2 shaw.lu$ ls -al
+total 56
+drwxr-xr-x  11 shaw.lu  admin   352 Dec 10 17:21 .
+drwxr-xr-x   8 shaw.lu  admin   256 Dec 10 14:12 ..
+-rw-r--r--   1 shaw.lu  admin   154 Dec 10 14:13 .gitattributes
+-rw-r--r--   1 shaw.lu  admin   103 Dec 10 14:13 .gitignore
+drwxr-xr-x  11 shaw.lu  admin   352 Dec 10 17:17 build
+-rw-r--r--   1 shaw.lu  admin  1033 Dec 10 17:17 build.gradle
+drwxr-xr-x   3 shaw.lu  admin    96 Dec 10 14:13 gradle
+-rwxr-xr-x   1 shaw.lu  admin  5764 Dec 10 14:13 gradlew
+-rw-r--r--   1 shaw.lu  admin  2942 Dec 10 14:13 gradlew.bat
+-rw-r--r--   1 shaw.lu  admin   354 Dec 10 14:13 settings.gradle
+drwxr-xr-x   4 shaw.lu  admin   128 Dec 10 14:13 src
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf ./build/*
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf gradle
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf gradlew
+(base) 04L0219100014DD:demo2 shaw.lu$ rm -rf gradlew.bat
+(base) 04L0219100014DD:demo2 shaw.lu$ ls -al
+total 32
+drwxr-xr-x  8 shaw.lu  admin   256 Dec 10 17:22 .
+drwxr-xr-x  8 shaw.lu  admin   256 Dec 10 14:12 ..
+-rw-r--r--  1 shaw.lu  admin   154 Dec 10 14:13 .gitattributes
+-rw-r--r--  1 shaw.lu  admin   103 Dec 10 14:13 .gitignore
+drwxr-xr-x  2 shaw.lu  admin    64 Dec 10 17:21 build
+-rw-r--r--  1 shaw.lu  admin  1033 Dec 10 17:17 build.gradle
+-rw-r--r--  1 shaw.lu  admin   354 Dec 10 14:13 settings.gradle
+drwxr-xr-x  4 shaw.lu  admin   128 Dec 10 14:13 src
+(base) 04L0219100014DD:demo2 shaw.lu$ less settings.gradle
+(base) 04L0219100014DD:demo2 shaw.lu$ ls -al
+total 56
+drwxr-xr-x  13 shaw.lu  admin   416 Dec 10 17:23 .
+drwxr-xr-x   8 shaw.lu  admin   256 Dec 10 14:12 ..
+-rw-r--r--   1 shaw.lu  admin   154 Dec 10 14:13 .gitattributes
+-rw-r--r--   1 shaw.lu  admin   103 Dec 10 14:13 .gitignore
+drwxr-xr-x   5 shaw.lu  admin   160 Dec 10 17:23 .gradle
+drwxr-xr-x   7 shaw.lu  admin   224 Dec 10 17:22 .idea
+drwxr-xr-x   2 shaw.lu  admin    64 Dec 10 17:21 build
+-rw-r--r--   1 shaw.lu  admin  1033 Dec 10 17:17 build.gradle
+drwxr-xr-x   3 shaw.lu  admin    96 Dec 10 17:23 gradle
+-rwxr-xr-x   1 shaw.lu  admin  5305 Dec 10 17:23 gradlew
+-rw-r--r--   1 shaw.lu  admin  2269 Dec 10 17:23 gradlew.bat
+-rw-r--r--   1 shaw.lu  admin   354 Dec 10 14:13 settings.gradle
+drwxr-xr-x   4 shaw.lu  admin   128 Dec 10 14:13 src
+(base) 04L0219100014DD:demo2 shaw.lu$
+
+```
