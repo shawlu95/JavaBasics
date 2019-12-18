@@ -1,4 +1,4 @@
-
+object
 ### Chapter 2
 Three steps towards better programmer:
 `syntax` -> `semantics` -> `pragmatics`
@@ -921,3 +921,25 @@ ___
 ### Chapter XI: Stream
 * byte stream: machine readable, `OutputStream`, `OutputStream`
 * character stream: human readable `Reader`, `Writer`
+
+* A token is a meaningful string of characters that cannot, for the purposes at hand, be further broken down into smaller meaningful pieces.
+* tokens must be separated by “delimiters.”
+* For object: `ObjectInputStream`, `ObjectOutputStream`
+  - object must implement `serializable` (no actual work)
+  - `ObjectOutputStream` does not write same obejct twice, second write is a reference
+* File:
+  - human readable: `FileReader`, `FileWriter`
+  - machine byte: `FileInputStream`, `FileOutputStream`
+  - The close() method of an output stream will cause all the data in the buffer to be sent to the file
+```java
+FileReader data;   // (Declare the variable before the
+                  //   try statement, or else the variable
+                  //   is local to the try block and you won’t
+                  //   be able to use it later in the program.)
+try {
+  data = new FileReader("data.txt");  // create the stream
+}
+catch (FileNotFoundException e) {
+  ... // do something to handle the error---maybe, end the program
+}
+```
