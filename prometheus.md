@@ -1,10 +1,16 @@
 ```bash
 # download the reporter corresponding to the correct flink version (1.9.1)
+# http://localhost:9090/graph
 ./prometheus --config.file=prometheus.yml
 cp /opt/flink-metrics-prometheus-1.9.1.jar /lib
 ```
 
 ```yaml
+# job manager and task manager run on different port
+- job_name: 'flink'
+  static_configs:
+  - targets: ['localhost:9250', 'localhost:9251']
+
 # conf/flink-conf.yaml
 metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
 metrics.reporter.prom.host: 192.168.1.226 # my home IP
