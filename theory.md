@@ -1,3 +1,8 @@
+## big_data_fundamentals.pdf
+Chapter 5-7
+* OLATP： online transaction processing
+* OLAP: online analytic processing
+
 #### File system
 * NTFS: windows
 * ext: Linux
