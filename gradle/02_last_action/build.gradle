@@ -1,0 +1,23 @@
+// gradle groupTherapy
+task startSession {
+  println 'Hello world!'
+  chant()
+}
+
+def chant() {
+  // ant that grants direct access to Ant tasks
+  ant.echo(message: 'Repeat after me...')
+}
+
+// dynamic task definition
+3.times {
+  // name the task yayGradle0, yayGradle1, yayGradle2
+  task "yayGradle$it" {
+    println 'Gradle rocks'
+  }
+}
+
+// build the DAG
+yayGradle0.dependsOn startSession
+yayGradle2.dependsOn yayGradle1, yayGradle0
+task groupTherapy(dependsOn: yayGradle2)

@@ -1,0 +1,7 @@
+// gradle helloWorld
+task helloWorld {
+   // last action of a task
+   doLast {
+      println 'Hello world!'
+   }
+}

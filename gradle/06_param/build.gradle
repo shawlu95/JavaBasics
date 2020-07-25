@@ -1,0 +1,13 @@
+// gradle printVersion1 -PVersion=1.01
+task printVersion1(group: 'versioning', description: 'Prints project version.') {
+  println "Version: $version"
+}
+
+task printVersion2 {
+  group = 'versioning'
+  description = 'Prints project version.'
+  version = '1.02'
+  doLast {
+    println "Version: $version"
+  }
+}

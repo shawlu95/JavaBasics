@@ -1,0 +1,21 @@
+// gradle build
+apply plugin: 'java'
+
+version = 0.1
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+  // group identifier, name, version
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.1'
+}
+
+// run app: java -cp build/classes/java/main com.manning.gia.todo.ToDoApp
+// run app: java -jar build/libs/03_to_do_cli-0.1.jar
+jar {
+  manifest {
+    attributes 'Main-Class': 'com.manning.gia.todo.ToDoApp'
+  }
+}

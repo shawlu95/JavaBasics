@@ -1,0 +1,11 @@
+// gradle third -PVersion=1
+// declare action dependencies
+task first { println "first" }
+task second { println "second" }
+
+task printVersion(dependsOn: [second, first]) {
+  logger.quiet "Version: $version"
+}
+
+task third { println "third" }
+third.dependsOn('printVersion')

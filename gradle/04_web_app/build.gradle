@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.gretty' version '2.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // need to compile, but provided at runtime
+    providedCompile 'javax.servlet:servlet-api:2.5',
+            'javax.servlet.jsp:jsp-api:2.1'
+    // no need to compile & provided at runtime
+    runtime 'javax.servlet:jstl:1.1.2',
+            'taglibs:standard:1.1.2'
+}
