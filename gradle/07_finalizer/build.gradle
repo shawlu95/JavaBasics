@@ -1,3 +1,5 @@
+// use case: clean up resource after job completes
+
 // gradle -q first
 task first { logger.quiet "first" }
 task second { logger.quiet "second" }

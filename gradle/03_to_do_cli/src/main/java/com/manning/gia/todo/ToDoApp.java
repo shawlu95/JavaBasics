@@ -18,6 +18,7 @@ public class ToDoApp {
       command = inputChars[0];
 
       // use external lib
+      // java.lang.NoClassDefFoundError: org/apache/commons/lang3/CharUtils
       // command = CharUtils.toChar(input, DEFAULT_INPUT);
 
       CommandLineInput commandLineInput = CommandLineInput.getCommandLineInputForInput(command);

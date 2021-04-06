@@ -1,3 +1,22 @@
+plugins {
+    id 'java' // war extends java, no need to import twice
+    id 'war'
+    id 'org.gretty' version '2.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // need to compile, but provided at runtime
+    providedCompile 'javax.servlet:servlet-api:2.5',
+            'javax.servlet.jsp:jsp-api:2.1'
+    // no need to compile & provided at runtime
+    runtime 'javax.servlet:jstl:1.1.2',
+            'taglibs:standard:1.1.2'
+}
+
 // relative to project directory (where build.gradle lives)
 ext.versionFile = file('version.properties')
 
@@ -91,4 +110,30 @@ class ReleaseVersionTask extends DefaultTask {
 task makeReleaseVersionWithCustomClass(type: ReleaseVersionTask) {
   release = version.release
   destFile = versionFile
+}
+
+// ZIP task
+task createDistribution(type: Zip, dependsOn: makeReleaseVersion) {
+  from war.outputs.files
+  from(sourceSets*.allSource) {
+    into 'src'
+  }
+
+  from(rootDir) {
+    include versionFile.name
+  }
+}
+
+// copy task
+task backupReleaseDistribution(type: Copy) {
+  from createDistribution.outputs.files
+
+  // backup folder is inside the build folder
+  into "$buildDir/backup"
+}
+
+task release(dependsOn: backupReleaseDistribution) {
+  doLast {
+    logger.quiet 'Releasing the project...'
+  }
 }

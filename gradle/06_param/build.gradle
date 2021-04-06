@@ -1,8 +1,13 @@
 // gradle printVersion1 -PVersion=1.01
+// run `gradle tasks` to see
+// the twp tasks are shown in `Versioning tasks` group
+
+// either define as arguments
 task printVersion1(group: 'versioning', description: 'Prints project version.') {
   println "Version: $version"
 }
 
+// or calling setter method
 task printVersion2 {
   group = 'versioning'
   description = 'Prints project version.'

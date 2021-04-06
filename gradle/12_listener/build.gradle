@@ -8,27 +8,6 @@ task loadVersion {
     project.version = readVersion()
 }
 
-task printVersion {
-    logger.quiet "Version: $version"
-}
-
-// run `gradle makeReleaseVersion` twice
-// will show it's up-to-date
-task makeReleaseVersion(group: 'versioning', description: 'Makes projecta release version.') {
-  // configuration
-  // make sure values are accessible in config time
-  inputs.property('release', version.release)
-  outputs.file versionFile
-
-  // action
-  doLast {
-    version.release = true
-    ant.propertyfile(file: versionFile) {
-      entry(key: 'release', type: 'string', operation: '=', value: 'true')
-    }
-  }
-}
-
 ProjectVersion readVersion() {
     logger.quiet 'Reading the version file.'
 
@@ -40,6 +19,7 @@ ProjectVersion readVersion() {
 
     versionFile.withInputStream { stream -> versionProps.load(stream) }
 
+    // do not need `return`
     new ProjectVersion(
       versionProps.major.toInteger(),
       versionProps.minor.toInteger(),
@@ -68,27 +48,30 @@ class ProjectVersion {
     }
 }
 
-// make custom class
-class ReleaseVersionTask extends DefaultTask {
-  @Input Boolean release
-  @OutputFile File destFile
+class ReleaseVersionListener implements TaskExecutionGraphListener {
+  final static String releaseTaskPath = ':release'
+  @Override
+  void graphPopulated(TaskExecutionGraph taskGraph) {
+    if(taskGraph.hasTask(releaseTaskPath)) {
+      // find release task
+      List<Task> allTasks = taskGraph.allTasks
+      Task releaseTask = allTasks.find {it.path == releaseTaskPath }
 
-  ReleaseVersionTask() {
-    group = 'versioning'
-    description = 'Makes project a release version.'
-  }
+      // every task knows its project
+      Project project = releaseTask.project
 
-  @TaskAction
-  void start() {
-    project.version.release = true
-    ant.propertyfile(file: destFile) {
-      entry(key: 'release', type: 'string', operation: '=', value: 'true')
+      if(!project.version.release) {
+        project.version.release = true
+        project.ant.propertyfile(file: project.versionFile) {
+          entry(key: 'release', type: 'string', operation: '=', value: 'true')
+        }
+      }
     }
   }
 }
+def releaseVersionListener = new ReleaseVersionListener()
+gradle.taskGraph.addTaskExecutionGraphListener(releaseVersionListener)
 
-// use the class
-task makeReleaseVersionWithCustomClass(type: ReleaseVersionTask) {
-  release = version.release
-  destFile = versionFile
+task release {
+  println "go"
 }

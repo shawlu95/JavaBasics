@@ -47,7 +47,8 @@ ___
 * support groovy and java
 * plugin: share reusable code across builds and projects
 * Ant target maps to gradle tasks
-
+* exclude a task with `-x` argument
+  - dependent tasks are also excluded "smart exclusion"
 ```bash
 -- examine avaiable tasks
 gradle -q tasks --all
@@ -72,7 +73,7 @@ gradle groupTherapy --daemon
 gradle --stop
 ```
 
-Web App
+#### Web App
 * `war` plubin
 * `jetty` -> replaced by `gretty`
 
@@ -101,6 +102,10 @@ Generated file
 * gradle-wrapper.properties: Wrapper metadata like storage location for downloaded distribution and originating URL
 * gradlew, gradlew.bat: Wrapper scripts for executing Gradle commands
 
+```BASH
+gradlew.bat jettyRun
+```
+
 ### Mastering Gradle Fundamentals
 Components of a build script
 * project: a script can have multiple interdependent projects
@@ -109,6 +114,7 @@ Components of a build script
   - can also define a property file `gradle.properties`
   - pass in properties in CLI via `-P` or `-D` flags
   - access properties: `$version` or `ext.version`
+* dependencies are distributed and used in the form of JAR files.
 
 ```java
 // declare action dependencies
@@ -131,6 +137,15 @@ task second << { println "second" }
 first.finalizedBy second
 ```
 
+### Build by Convention
+* source code: `src/main/java`
+* test code: `src/test/java`
+* web app (html, css): `src/main/webapp`
+
+### WAR
+* Extend `java` plugin, only needs to import once
+* packaged files is in `./build/libs`
+* Check content of packaged jar: `jar tf 04_web_app.war`
 Build phases
 1. initialization
 2. configuration
@@ -141,9 +156,105 @@ Build phases
 * providedCompile: need to compile, but provided at runtime
 * runtime: no need to compile & provided at runtime
 
+### Lifecycle
+1. initialization phase: init a project instance
+2. configuration phase
+  - execute task config blocks before any tasks
+  - executed with every build of the project
+3. execution phase: see example `09_config_file`
+  - execute tasks in correct order (dependency)
+  - up-to-date tasks are skipped
+
+### Listening to Lifecycle Events
+* define code in a closure
+* use listener interface
+
+### Build Env
+* create init script in `~/.gradle/init.d/build-announcements.gradle`
+* won't get fired if placed in build.gradle because project init already happened (init phase)
+```
+gradle.projectsLoaded { Gradle gradle ->
+  gradle.rootProject {
+    apply plugin: 'build-announcements'
+  }
+}
+```
 
 ### Resources
 * Asgard, a web-based cloud management and deploy- ment tool built and used by Netflix
 * search maven repository: http://search.maven.org/
 * Jetty: allow changing static files without restarting container
 * JRebel: perform hot deployment for class file changes.
+
+___
+## Chapter 5 - Dependency
+Two open source solution
+* Apache Ivy for ant project
+* Maven
+
+![alt-text](./assets/dependency_type.png)
+
+### Configuration
+* Every project owns a container of class `ConfigurationContainer` that manages the corresponding configurations.
+* a dependency is defined by `group`, `name`, `version`, `classifier`
+* configuration is a logical grouping of dependencies
+* java plugin provides 6 configurations
+  - compile
+  - runtime
+  - testCompile
+  - testRuntime
+  - archive
+  - default
+* excluding transitive dependency:
+* detects if an artifact was changed in the repository by comparing its local and remote checksum
+* Gradle support offline mode, which only checks local cache
+
+```java
+dependencies {
+  cargo('org.codehaus.cargo:cargo-ant:1.3.1') {
+    exclude group: 'xml-apis', module: 'xml-apis'
+
+    // or exclude all
+    // transitive = false
+  }
+  cargo 'xml-apis:xml-apis:2.0.2'
+}
+
+// print path to local cache
+task printDependencies << { configurations.getByName('cargo').each { dependency ->
+      println dependency
+   }
+}
+
+// no cache
+configurations.cargo.resolutionStrategy {
+  cacheDynamicVersionsFor 0, 'seconds'
+}
+configurations.compile.resolutionStrategy {
+  cacheChangingModulesFor 0, 'seconds'
+}
+```
+
+* generate dependency report for a dependency of a configuration
+
+```bash
+gradle -q dependencyInsight --configuration cargo --dependency
+
+gradle --refresh-dependencies
+
+```
+
+___
+## Chapter 6
+* The declaration of subprojects in a multiproject build is done via the settings file. `settings.gradle`
+* settings file is evaluated and executed during the initialization phase
+* The root project and all subprojects should use the same group and version property value.
+* All subprojects are Java projects and require the Java plugin to function correctly, so you’ll only need to apply the plugin to subprojects, not the root project.
+* project dependency: `compile project(':model')`
+```bash
+gradle projects
+gradle :model:build
+gradle :repository:build -a
+gradle :repository:buildNeeded
+gradle :repository:buildDependents
+```

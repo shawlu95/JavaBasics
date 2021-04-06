@@ -1,3 +1,7 @@
+// Groovy’s equivalent to POJOs, only require you to declare properties without an access modifier.
+// Their getter and setter methods are intrinsically added at the time of bytecode generation and therefore are available at runtime.
+// gradle printVersion
+
 version = new ProjectVersion(0, 1)
 
 class ProjectVersion {

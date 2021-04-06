@@ -1,0 +1,58 @@
+ext.projectIds = ['group': 'com.manning.gia', 'version': '0.1']
+
+group = projectIds.group
+version = projectIds.version
+
+task hello {
+   doLast {println 'Hello from root project'}
+}
+
+// gradle :model:build
+project(':model') {
+  group = projectIds.group
+  version = projectIds.version
+  apply plugin: 'java'
+
+  // check run order: gradle hello
+  task hello (dependsOn: ':repository:hello') {
+     doLast {println 'Hello from model'}
+  }
+}
+
+// partial build: gradle :repository:build -a
+project(':repository') {
+  group = projectIds.group
+  version = projectIds.version
+  apply plugin: 'java'
+
+  dependencies {
+    compile project(':model')
+  }
+
+  task hello {
+     doLast {println 'Hello from repository'}
+  }
+}
+
+project(':web') {
+  group = projectIds.group
+  version = projectIds.version
+  apply plugin: 'java'
+  apply plugin: 'war'
+  // apply plugin: 'org.gretty' version '2.1.0'
+
+  repositories {
+      mavenCentral()
+  }
+
+  dependencies {
+    // need to compile, but provided at runtime
+    providedCompile 'javax.servlet:servlet-api:2.5',
+            'javax.servlet.jsp:jsp-api:2.1'
+    // no need to compile & provided at runtime
+    runtime 'javax.servlet:jstl:1.1.2',
+            'taglibs:standard:1.1.2'
+
+    compile project(':repository')
+  }
+}

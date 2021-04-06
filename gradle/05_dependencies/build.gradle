@@ -1,11 +1,21 @@
-// gradle third -PVersion=1
+// gradle -q third
 // declare action dependencies
+
 task first { println "first" }
 task second { println "second" }
+version='0.1-SNAPSHOT'
 
+// assigning multiple dependencies
+// execution order is not deterministic.
 task printVersion(dependsOn: [second, first]) {
-  logger.quiet "Version: $version"
+  doFirst {println "before"}
+  doLast {println "Version: $version"}
 }
 
+printVersion.doFirst { println "First action" }
+printVersion.doLast { println "Last action" }
+
 task third { println "third" }
+
+// referencing tasks by name whe ndeclaring dependency
 third.dependsOn('printVersion')

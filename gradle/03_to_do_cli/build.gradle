@@ -1,7 +1,7 @@
 // gradle build
 apply plugin: 'java'
 
-version = 0.1
+version = 0.2
 
 repositories {
    mavenCentral()
@@ -14,6 +14,7 @@ dependencies {
 
 // run app: java -cp build/classes/java/main com.manning.gia.todo.ToDoApp
 // run app: java -jar build/libs/03_to_do_cli-0.1.jar
+// if run from jar file, must specify class path in build script
 jar {
   manifest {
     attributes 'Main-Class': 'com.manning.gia.todo.ToDoApp'
